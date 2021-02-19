@@ -1,0 +1,27 @@
+version: "3.8"
+
+
+services:
+  statistic:
+    build: .
+    container_name: statistic
+    hostname: statistic
+    network_mode: "host"
+    env_file:
+      - .env
+    ports:
+      - "7040:7040"
+
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    hostname: mongodb
+    env_file:
+      - .env
+    ports:
+      - 27017:27017
+    volumes:
+      - mongodb:/data/db
+
+volumes:
+  mongodb:
