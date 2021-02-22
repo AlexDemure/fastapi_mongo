@@ -13,8 +13,8 @@ async def upload_test_data_to_mongodb():
     # file = download_file_from_dashboard()
     # filepath = file.filepath
 
-    current_dashboard = "backend/src/apps/xlsx/static/current_dashboard.xlsx"
-    new_dashboard = "backend/src/apps/xlsx/static/new_dashboard.xlsx"
+    current_dashboard = "src/apps/xlsx/static/current_dashboard.xlsx"
+    new_dashboard = "src/apps/xlsx/static/new_dashboard.xlsx"
 
     print("Start upload test data.")
     count_documents = await get_count_documents_by_date_today()
