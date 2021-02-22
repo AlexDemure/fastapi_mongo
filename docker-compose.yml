@@ -2,10 +2,10 @@ version: "3.8"
 
 
 services:
-  statistic:
+  statistics:
     build: backend
-    container_name: statistic
-    hostname: statistic
+    container_name: statistics
+    hostname: statistics
     network_mode: "host"
     env_file:
       - backend/.env
