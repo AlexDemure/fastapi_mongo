@@ -1,7 +1,9 @@
 from datetime import datetime
 from decimal import Decimal
 from typing import List
+
 from pydantic import BaseModel, root_validator
+
 from backend.src.overrides import get_datetime_start_day, get_datetime_for_last_week
 
 

@@ -4,6 +4,7 @@ from backend.src.apps.statistics.crud import (
     get_total_data_by_period, get_diagram_data_by_periods,
     get_table_data_by_episodes, get_table_data_by_analytics
 )
+from backend.src.overrides import get_datetime_for_last_week
 from backend.src.schemas.statistics import (
     BaseParams, DiagramParams, DiagramData,
     DiagramPoint, TotalData, TableParams,
@@ -11,7 +12,6 @@ from backend.src.schemas.statistics import (
     TableRowByAnalytics, TableDataByAnalytics
 )
 from backend.src.utils import convert_number_to_decimal
-from backend.src.overrides import get_datetime_for_last_week
 
 
 async def collect_total_data(params: BaseParams) -> TotalData:

@@ -1,10 +1,10 @@
 import uvicorn
 from fastapi import FastAPI
 
-from backend.src.db.database import dashboards_db
-from backend.src.fixtures import upload_test_data_to_mongodb
+from backend.src.apps.xlsx.fixtures import upload_test_data_to_mongodb
 from backend.src.core.config import settings
 from backend.src.core.urls import api_router
+from backend.src.db.database import dashboards_db
 
 app = FastAPI()
 

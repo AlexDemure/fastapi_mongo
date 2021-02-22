@@ -1,6 +1,3 @@
-from decimal import Decimal, ROUND_DOWN
-from typing import Union
-
 from backend.src.overrides import get_datetime_start_day
 
 
