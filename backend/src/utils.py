@@ -1,6 +1,9 @@
+from decimal import Decimal, ROUND_DOWN
+from typing import Union
+
 from openpyxl import load_workbook
 
-from serializer import prepare_current_data_to_mongo, prepare_new_data_to_mongo
+from backend.src.apps.statistics.serializer import prepare_current_data_to_mongo, prepare_new_data_to_mongo
 
 
 def parse_xlsx(filepath: str) -> tuple:
@@ -87,3 +90,11 @@ def merge_lines(current_dashboard: list, new_dashboard: list) -> list:
 
     return merged_items
 
+
+def convert_number_to_decimal(num: Union[int, float, Decimal]) -> Decimal:
+    """
+    Конвертация всех числовых значений в Decimal с округлением вниз.
+
+    На выходе получаем Decimal в формате 0.00
+    """
+    return Decimal(num).quantize(Decimal('0.00'), rounding=ROUND_DOWN)

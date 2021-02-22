@@ -3,12 +3,12 @@ version: "3.8"
 
 services:
   statistic:
-    build: .
+    build: backend
     container_name: statistic
     hostname: statistic
     network_mode: "host"
     env_file:
-      - .env
+      - backend/.env
     ports:
       - "7040:7040"
 
@@ -17,7 +17,7 @@ services:
     container_name: mongodb
     hostname: mongodb
     env_file:
-      - .env
+      - backend/.env
     ports:
       - 27017:27017
     volumes:

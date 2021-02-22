@@ -1,6 +1,7 @@
-import logging
+
 from motor import motor_asyncio
-from .settings import settings
+
+from backend.src.core.config import settings
 
 
 class AIOMotor:

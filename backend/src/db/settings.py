@@ -13,6 +13,3 @@ class MongoDBSettings(BaseSettings):
 
     def get_uri(self):
         return f"mongodb://{self.mongo_username}:{self.mongo_password}@{self.mongo_host}:{self.mongo_port}/"
-
-
-settings = MongoDBSettings()

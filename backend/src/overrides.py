@@ -7,9 +7,9 @@ def get_fake_datetime() -> datetime:
     return datetime.utcnow() + timedelta(days=int(os.environ.get('DAYS', 0)))
 
 
-def get_datetime_start_day() -> datetime:
+def get_datetime_start_day(date: datetime = get_fake_datetime()) -> datetime:
     """Получение сегодняшней даты в формате datetime с минимальным значениями в часах."""
-    return datetime.combine(get_fake_datetime(), time.min)
+    return datetime.combine(date, time.min)
 
 
 def get_datetime_for_last_week() -> datetime:
