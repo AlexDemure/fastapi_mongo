@@ -5,6 +5,7 @@ services:
   statistics:
     build: backend
     container_name: statistics
+    command: uvicorn backend.src.core.application:app --host 127.0.0.1 --port 7040
     hostname: statistics
     network_mode: "host"
     env_file:
@@ -12,7 +13,7 @@ services:
     ports:
       - "7040:7040"
     volumes:
-      - ./backend:/app/backend/
+      - ./backend:/backend/
 
   mongodb:
     image: mongo:latest
