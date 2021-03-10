@@ -1,38 +1,319 @@
 .App {
   text-align: center;
+  padding: 0 165px 100px;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
+/*  title  */
+.title {
+  display: grid;
+  grid-template-columns: repeat(2, max-content);
+  justify-content: space-between;
   align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+  margin-top: 60px;
 }
 
-.App-link {
-  color: #61dafb;
+.title h1 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: normal;
+  color: #48001E;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.title span {
+  padding: 15px 40px;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: 100px;
+  background: #FF5C28;
+  cursor: pointer;
 }
+/*  title  */
+
+/*  top  */
+.top {
+  display: grid;
+  grid-template-columns: repeat(2, max-content);
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 100px;
+}
+
+.top h1 {
+  font-size: 32px;
+  font-weight: 600;
+  line-height: 40px;
+  color: #48001E;
+}
+
+.top .date {
+  position: relative;
+}
+.top .date .selected_date {
+  padding: 13px 20px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+  color: #666;
+  cursor: pointer;
+}
+.top .date > span {
+  color: #666;
+  font-size: 14px;
+}
+.top .date .calendar {
+  position: absolute;
+  top: 120%;
+  right: 0;
+  width: 490px;
+  text-align: left;
+  padding: 30px;
+  border: 1px solid #f9f9f9;
+  border-radius: 10px;
+  background: #fff;
+  box-shadow: 0px 42px 63px rgba(0, 0, 0, 0.06),
+              0px 16.1778px 20.0667px rgba(0, 0, 0, 0.0364444),
+              0px 3.42222px 5.13333px rgba(0, 0, 0, 0.0235556);
+}
+.top .date .calendar .btn {
+  display: inline-block;
+  color: #000;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 50px;
+  padding: 10px 25px;
+  margin-right: 15px;
+  margin-top: 30px;
+  cursor: pointer;
+}
+.top .date .calendar .btn:hover {
+  background: #ff5c2833;
+}
+.top .date .calendar .btn.active {
+  background: #FF5C28;
+  color: #fff;
+}
+/*  top  */
+
+/*  total  */
+.total {
+  display: grid;
+  grid-template-columns: repeat(3, 255px);
+  grid-gap: 30px;
+  margin-top: 40px;
+}
+
+.total .item {
+  padding: 15px;
+  border-radius: 10px;
+  color: #48001E;
+  text-align: left;
+}
+
+.total .item:nth-child(1), .total .item:nth-child(2) {
+  background: #00a5691a;
+}
+
+.total .item:nth-child(3) {
+  background: #ff5c281a;
+}
+
+.total .item:nth-child(1) .week, .total .item:nth-child(2) .week {
+  color: #00A569;
+}
+
+.total .item:nth-child(3) .week {
+  color: #FF5C28;
+}
+
+.total .item .week {
+  font-size: 12px;
+  margin: 0;
+  text-align: right;
+}
+
+.total .item .count {
+  margin: 10px 0 15px;
+  font-size: 28px;
+}
+
+.total .item .count span {
+  font-size: 12px;
+}
+
+.total .item .name {
+  font-size: 12px;
+  margin: 0;
+}
+/*  total  */
+
+/*  diagram  */
+.diagram {
+  width: 100%;
+  margin-top: 30px;
+}
+/*  diagram  */
+
+/*  table  */
+.table {
+  width: 100%;
+  margin-top: 30px;
+  text-align: left;
+}
+
+.table-header {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  grid-gap: 25px;
+  color: #666;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 15px;
+}
+
+.table-body {
+  border-top: 1px solid #ccc;
+  border-bottom: 1px solid #ccc;
+}
+
+.table-body-row {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  grid-gap: 25px;
+  font-size: 14px;
+  padding: 15px;
+}
+/*  table  */
+
+/*  control table  */
+.control_table {
+  display: grid;
+  grid-template-columns: 250px 400px;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+.control_table .count_rows {
+  display: grid;
+  grid-template-columns: 80px auto;
+  align-items: baseline;
+}
+.control_table .count_rows .total_rows {
+  font-size: 14px;
+  color: #666;
+  font-weight: 400;
+}
+/*  control table  */
+
+/*  select  */
+.select {
+  width: 80px;
+  height: 40px;
+  font-weight: 400;
+  cursor: pointer;
+}
+.custom-select-opener {
+  position: relative;
+  padding: 10px 15px;
+  /*width: 100%;*/
+  /*height: 100%;*/
+  color: #666;
+  font-size: 14px;
+  line-height: 14px;
+  text-align: left;
+  background-color: #FFFFFF;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  overflow: hidden;
+}
+.custom-select-opener::before {
+  position: absolute;
+  top: 12px;
+  right: 15px;
+  content: '';
+  width: 5px;
+  height: 5px;
+  border-right: 2px solid #666;
+  border-bottom: 2px solid #666;
+  transform: rotate(45deg);
+  transition: 0.2s;
+}
+.custom-select-opener.is-open::before {
+  top: 15px;
+  border-right: 2px solid #FF5C28;
+  border-bottom: 2px solid #FF5C28;
+  transform: rotate(-135deg);
+}
+.custom-select-panel {
+  visibility: hidden;
+  /*opacity: 0;*/
+  max-height: 0;
+  margin: 0;
+}
+.custom-select-panel.is-open {
+  visibility: visible;
+  /*opacity: 1;*/
+  font-size: 14px;
+  line-height: 18px;
+  color: #666;
+  /*box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);*/
+  transition: 0.2s;
+  /*margin-top: 10px;*/
+  overflow-y: hidden;
+  max-height: 248px;
+  background: #fff;
+}
+.custom-select-option {
+  padding: 5px 15px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+.custom-select-option:hover {
+  background-color: #F6F6F6;
+}
+/*  select  */
+
+/*  pagination  */
+.pagination {
+  display: grid;
+  /*grid-template-columns: repeat(9, 40px);*/
+  justify-content: end;
+  grid-gap: 5px;
+  height: 40px;
+}
+.pagination .prev_arrow, .pagination .next_arrow {
+  position: relative;
+}
+.pagination .prev_arrow::before, .pagination .next_arrow::before {
+  position: absolute;
+  content: '';
+  top: 50%;
+  left: 50%;
+  width: 10px;
+  height: 10px;
+  border-right: 2px solid #48001E;
+  border-bottom: 2px solid #48001E;
+  transform: translate(-50%, -50%) rotateZ(-45deg);
+}
+.pagination .prev_arrow::before {
+  transform: translate(-30%, -50%) rotateZ(135deg);
+}
+.pagination .next_arrow::before {
+  transform: translate(-70%, -50%) rotateZ(-45deg);
+}
+.pagination > div {
+  color: #48001E;
+  font-size: 16px;
+  padding: 10px;
+  border-radius: 50px;
+  cursor: default;
+}
+.pagination .prev_arrow:hover, .pagination .next_arrow:hover, .pagination .page:hover {
+  background: #ff5c2833;
+  cursor: pointer;
+}
+.pagination .current {
+  background: #FF5C28;
+  color: #fff;
+  cursor: default;
+}
+/*  pagination  */
