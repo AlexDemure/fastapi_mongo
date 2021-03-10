@@ -1,11 +1,7 @@
-FROM tiangolo/uvicorn-gunicorn:python3.8
+FROM python:3.8-slim
 
-WORKDIR /app/backend
+RUN pip install uvicorn fastapi motor pymongo pydantic openpyxl
 
-RUN pip install fastapi motor pymongo pydantic openpyxl
-
-COPY . /app/backend
+COPY . .
 
 EXPOSE 7040
-
-CMD ["python", "src/core/application.py"]
