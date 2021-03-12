@@ -1,12 +1,12 @@
-from decimal import Decimal, ROUND_DOWN
-from typing import Union
+import csv
+from uuid import UUID
 
-from openpyxl import load_workbook
+from openpyxl import load_workbook, Workbook
 
 from backend.src.apps.xlsx.serializer import prepare_current_data_to_mongo, prepare_new_data_to_mongo
 
 
-def parse_xlsx(filepath: str) -> tuple:
+def parse_xlsx_to_convert_data_to_dict(filepath: str) -> tuple:
     """
     Функция для парсинга данных из xlsx файла.
 
@@ -89,3 +89,47 @@ def merge_lines(current_dashboard: list, new_dashboard: list) -> list:
                     merged_items.append(data)
 
     return merged_items
+
+
+def write_data_to_xlsx(data, path_to_file):
+    """Запись подготовленных данных статистики в xlsx"""
+
+    # Создаем файл для записи данных пользователя.
+    new_xlsx = Workbook()
+    sheet_for_writing = new_xlsx.active
+
+    # index - нужен для нумерации строк. row - список данных для записи.
+    for index, row in enumerate(data):
+
+        for item in range(len(row)):
+            # Нумерация строк и колон начинается с 1, добавляем к индуксу 1.
+            new_row, column = index + 1, item + 1
+
+            value = row[item]
+            # openpyxl не может записать UUID, проверяем и преобразуем UUID в str.
+            if isinstance(value, UUID):
+                value = str(value)
+
+            sheet_for_writing.cell(row=new_row, column=column, value=value)
+
+    new_xlsx.save(path_to_file)
+
+
+def prepare_data_from_csv_for_xlsx(file_path_to_csv: str):
+    """
+    Получаем подготовленный к записи в xlsx список с данными из файла CSV.
+
+    Каждый элемента списка - список с данными колонок.
+    :param file_path_to_csv: Путь к CSV файлу с данными для записи в xlsx.
+    """
+    prepared_data_for_xlsx = list()
+
+    with open(file_path_to_csv, 'r', encoding='utf-8') as file:
+        csv_file = csv.reader(file)
+        for row in csv_file:
+            prepared_data = list()  # Список для данных из строки
+            for value in row:
+                prepared_data.append(value)
+            prepared_data_for_xlsx.append(prepared_data)
+
+    return prepared_data_for_xlsx
