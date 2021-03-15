@@ -72,3 +72,18 @@ async def get_analytics_data(params: TableParams):
      чтобы передавать номер страницы необходимо высчитывать по формуле limit * number_page.
     """
     return await collect_table_data_by_analytics(params)
+
+
+@router.get("/get_total_statistics_xlsx/")
+async def get_total_statistics_xlsx():
+    pass
+
+
+@router.get("/get_analytics_statistics_xlsx/")
+async def get_analytics_statistics_xlsx():
+    pass
+
+
+@router.get("/get_episodes_statistics_xlsx/")
+async def get_episodes_statistics_xlsx():
+    pass

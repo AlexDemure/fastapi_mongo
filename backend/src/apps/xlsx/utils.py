@@ -1,4 +1,5 @@
 import csv
+from datetime import datetime, timedelta, time
 from uuid import UUID
 
 from openpyxl import load_workbook, Workbook
@@ -21,7 +22,8 @@ def parse_xlsx_to_convert_data_to_dict(filepath: str) -> tuple:
 
     for index, row in enumerate(sheet.rows):
         if index == 0:
-            keys = [x.value for x in row]
+            # В случае если повилась \ufeff (метка порядка байтов или BOM), убираем ее.
+            keys = [x.value.replace('\ufeff', '').lower() for x in row]
             continue
 
         # Преобразуем данные внутри строки в список
@@ -51,7 +53,7 @@ def convert_xlsx_rows_to_dict(keys: list, rows: list) -> list:
     return converted_data
 
 
-def merge_lines(current_dashboard: list, new_dashboard: list) -> list:
+def merge_lines(current_dashboard: list, new_dashboard: list, uploaded_at_date_time: datetime = None) -> list:
     """
     Функция для слияния двух строк из разных таблицы XLSX необходимо для подготовки данных в MongoDB.
 
@@ -62,15 +64,15 @@ def merge_lines(current_dashboard: list, new_dashboard: list) -> list:
 
     for dict_current_data in current_dashboard:
         for key, value in dict_current_data.items():  # Перебор ключей в строке основонго дашборда
-            if key == "Title":  # Если ключ Title начинаем поиск по названию внутри нового дашборда
+            if key == "title":  # Если ключ Title начинаем поиск по названию внутри нового дашборда
 
                 row_is_find = False  # Начальное состояние поиска
 
                 for dict_new_data in new_dashboard:  # Перебор ключей в строке основонго дашборда
 
-                    if value == dict_new_data['Title']:  # Если значения совпадают собираем все в одну строку.
+                    if value == dict_new_data['title']:  # Если значения совпадают собираем все в одну строку.
                         data = {
-                            **prepare_current_data_to_mongo(dict_current_data),
+                            **prepare_current_data_to_mongo(dict_current_data, uploaded_at_date_time),
                             **prepare_new_data_to_mongo(dict_new_data),
                         }
 
@@ -83,7 +85,7 @@ def merge_lines(current_dashboard: list, new_dashboard: list) -> list:
 
                 if row_is_find is False:  # Иначе заполняем дефолтными значениями из нового дашборда
                     data = {
-                        **prepare_current_data_to_mongo(dict_current_data),
+                        **prepare_current_data_to_mongo(dict_current_data, uploaded_at_date_time),
                         **prepare_new_data_to_mongo(),
                     }
                     merged_items.append(data)

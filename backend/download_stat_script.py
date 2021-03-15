@@ -2,6 +2,7 @@ import argparse
 import asyncio
 import time
 from datetime import datetime, timedelta
+from datetime import time as t
 
 from structlog import get_logger
 
@@ -70,7 +71,7 @@ async def download_statistics_from_certain_date(start_date: str, end_date: str, 
         #  а именно что count_documents == rows_in_xlsx (без учета шапки)
         if count_documents > 0:
             logger.debug(f"Documents found. Skipping loading test data. Count documents today:{count_documents}")
-            return
+            continue
 
         keys, rows = parse_xlsx_to_convert_data_to_dict(general_statistics)
         converted_current_data = convert_xlsx_rows_to_dict(keys, rows)
@@ -78,7 +79,9 @@ async def download_statistics_from_certain_date(start_date: str, end_date: str, 
         keys, rows = parse_xlsx_to_convert_data_to_dict(audiobook_rates_statistic)
         converted_new_data = convert_xlsx_rows_to_dict(keys, rows)
 
-        converted_data = merge_lines(converted_current_data, converted_new_data)
+        uploaded_at_date_time = datetime.combine(date, t.min)  # Дата выгрузки статистики для MongoDB
+        converted_data = merge_lines(converted_current_data, converted_new_data, uploaded_at_date_time)
+
         if len(converted_data) != 0:
             await add_many_documents(documents=converted_data, db=db)  # Множественная загрузка в БД
 
