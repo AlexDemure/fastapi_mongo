@@ -40,11 +40,22 @@ class App extends Component {
   }
 
   onChangeSelectedDate = (value) => {
+    let startDate = null;
+    let endDate = null;
+    if(value === 'all') {
+      startDate = moment().set({'year': 2020, 'month': 5, 'date': 1});
+      endDate = moment();
+    }
+    if(value === 'last') {
+      startDate = moment().subtract(1, 'months');
+      endDate = moment();
+    }
+
     this.setState({
       selected_date: value,
-      startDate: null,
-      endDate: null
-    });
+      startDate: Date.parse(startDate),
+      endDate: Date.parse(endDate)
+    }, () => {this.getEpisodesData(); this.getDiagramData()});
   }
 
   onChangeDate = (dates) => {
@@ -54,12 +65,13 @@ class App extends Component {
       startDate: start,
       endDate: end,
       selected_date: selected_date
-    }, this.getEpisodesData);
+    }, () => {this.getEpisodesData(); this.getDiagramData()});
   }
 
   onChangeLimit = (limit) => {
     this.setState({
-      limit
+      limit,
+      current_page: 1
     }, this.getEpisodesData);
   }
 
@@ -93,6 +105,7 @@ class App extends Component {
   }
 
   getDiagramData = () => {
+    let {startDate, endDate} = this.state;
     let request = {
       books: [
         "0405010081641",
@@ -102,24 +115,12 @@ class App extends Component {
         "0405010083348",
         "0405010075442"
       ],
-      start_date: "2021-02-15T00:00:00",
-      end_date: "2021-02-22T00:00:00"
+      start_date: startDate,
+      end_date: endDate
     };
     axios.post('http://localhost:7040/api/v1/statistics/diagram/', request).then(res => {
-      let points = [...res.data.points,
-        {day: "2021-02-23T00:00:00", total_hours: 8484.25},
-        {day: "2021-02-24T00:00:00", total_hours: 484.25},
-        {day: "2021-02-25T00:00:00", total_hours: 3484.25},
-        {day: "2021-02-26T00:00:00", total_hours: 1484.25},
-        {day: "2021-02-27T00:00:00", total_hours: 9484.25},
-        {day: "2021-03-01T00:00:00", total_hours: 184.25},
-        {day: "2021-03-02T00:00:00", total_hours: 3333.25},
-        {day: "2021-03-10T00:00:00", total_hours: 8484.25},
-        {day: "2021-03-15T00:00:00", total_hours: 4484.25},
-        {day: "2021-03-17T00:00:00", total_hours: 1484.25},
-        {day: "2021-03-26T00:00:00", total_hours: 5484.25}];
       this.setState({
-        points: points
+        points: res.data.points
       }, this.createDiagram);
     });
   }
@@ -271,12 +272,12 @@ class App extends Component {
         </div>
         <div className="title">
           <h1>Всего прослушанных часов</h1>
-          <span>Скачать .xlsx</span>
+          <a href='http://localhost:7040/api/v1/get_analytics_statistics_xlsx/' download>Скачать .xlsx</a>
         </div>
         <canvas className="diagram" ref={node => this.canvas = node} height={500}/>
         <div className="title">
           <h1>Прослушивания по эпизодам</h1>
-          <span>Скачать .xlsx</span>
+          <a href='http://localhost:7040/api/v1/get_episodes_statistics_xlsx/' download>Скачать .xlsx</a>
         </div>
         <div className="table">
           <div className="table-header">
