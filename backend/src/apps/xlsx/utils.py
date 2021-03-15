@@ -1,5 +1,5 @@
 import csv
-from datetime import datetime, timedelta, time
+from datetime import datetime
 from uuid import UUID
 
 from openpyxl import load_workbook, Workbook
@@ -133,5 +133,24 @@ def prepare_data_from_csv_for_xlsx(file_path_to_csv: str):
             for value in row:
                 prepared_data.append(value)
             prepared_data_for_xlsx.append(prepared_data)
+
+    return prepared_data_for_xlsx
+
+
+def prepare_data_from_mongo_for_xlsx(data: list) -> list:
+    """
+   Получаем подготовленный к записи в xlsx список с данными из MongoDB.
+
+   Каждый элемента списка - список с данными колонок.
+   :param data: Список словарей с данными о материалах.
+   """
+    prepared_data_for_xlsx = list()
+
+    titles = list(data[0].keys())[1:]  # Список названий колонок. Не включаем первый элемент - объект ObjectId
+    prepared_data_for_xlsx.append(titles)
+
+    for material_data in data:
+        column_values = list(material_data.values())[1:]  # Список значеий колонок. Не вкл. 1-й элемент - ObjectId
+        prepared_data_for_xlsx.append(column_values)
 
     return prepared_data_for_xlsx
