@@ -14,8 +14,8 @@ class App extends Component {
     super(props);
     this.state = {
       points: [],
-      startDate: null,
-      endDate: null,
+      startDate: moment().set({'year': 2020, 'month': 5, 'date': 1}),
+      endDate: moment(),
       show_calendar: false,
       selected_date: 'all', //all, last, 21.02.2021-23.02.2021
       total_hours_listened: 0,
@@ -101,6 +101,48 @@ class App extends Component {
         average_listening_percentage: Math.floor(res.data.average_listening_percentage),
         average_listening_in_week: Math.floor(res.data.average_listening_in_week)
       });
+    });
+  }
+
+  getDiagramXlsx = () => {
+    let {limit, current_page, startDate, endDate} = this.state;
+    let request = {
+      books: [
+        "0405010081641",
+        "0405010087919",
+        "0405010083614",
+        "0405010083416",
+        "0405010083348",
+        "0405010075442"
+      ],
+      start_date: startDate,
+      end_date: endDate,
+      limit: limit,
+      offset: (current_page-1) * limit  //'-1' потому что отчет с первой страницы, а не с нулевой. при умножении отбрасывается корректное количество записей таблицы на предыдущих страницах
+    };
+    axios.post('http://localhost:7040/api/v1/get_analytics_statistics_xlsx/', request).then(res => {
+      console.log(res.data);
+    });
+  }
+
+  getEpisodesXlsx = () => {
+    let {limit, current_page, startDate, endDate} = this.state;
+    let request = {
+      books: [
+        "0405010081641",
+        "0405010087919",
+        "0405010083614",
+        "0405010083416",
+        "0405010083348",
+        "0405010075442"
+      ],
+      start_date: startDate,
+      end_date: endDate,
+      limit: limit,
+      offset: (current_page-1) * limit  //'-1' потому что отчет с первой страницы, а не с нулевой. при умножении отбрасывается корректное количество записей таблицы на предыдущих страницах
+    };
+    axios.post('http://localhost:7040/api/v1/get_episodes_statistics_xlsx/', request).then(res => {
+      console.log(res.data);
     });
   }
 
@@ -272,12 +314,12 @@ class App extends Component {
         </div>
         <div className="title">
           <h1>Всего прослушанных часов</h1>
-          <a href='http://localhost:7040/api/v1/get_analytics_statistics_xlsx/' download>Скачать .xlsx</a>
+          <span onClick={this.getDiagramXlsx}>Скачать .xlsx</span>
         </div>
         <canvas className="diagram" ref={node => this.canvas = node} height={500}/>
         <div className="title">
           <h1>Прослушивания по эпизодам</h1>
-          <a href='http://localhost:7040/api/v1/get_episodes_statistics_xlsx/' download>Скачать .xlsx</a>
+          <span onClick={this.getEpisodesXlsx}>Скачать .xlsx</span>
         </div>
         <div className="table">
           <div className="table-header">
