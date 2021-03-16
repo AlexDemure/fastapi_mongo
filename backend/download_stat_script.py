@@ -1,7 +1,7 @@
 import argparse
 import asyncio
 import time
-from datetime import datetime, time
+from datetime import datetime
 from datetime import time as t
 
 from structlog import get_logger
@@ -33,7 +33,7 @@ async def download_statistics_from_certain_date(start_date: str, end_date: str, 
 
     for date in get_every_date_in_dates_range_generator(start_date, end_date):
 
-        # date = datetime.date(2020, 1, 30)
+        logger.debug(f"Start upload statistics for {date}.")
 
         general_statistics = data_studio.download_general_statistics_for_one_day(date=date)
 
@@ -41,8 +41,6 @@ async def download_statistics_from_certain_date(start_date: str, end_date: str, 
         time.sleep(5)
 
         audiobook_rates_statistic = data_studio.download_audiobook_rates_statistic_for_one_day(date=date)
-
-        logger.debug("Start upload test data.")
         count_documents = await get_count_documents_by_date_today(db=db)
 
         # TODO Написать проверку что все записи были записаны в БД
@@ -93,7 +91,7 @@ async def upload_test_data_to_mongodb(start_date: str, end_date: str, db=dashboa
         keys, rows = parse_xlsx_to_convert_data_to_dict(new_dashboard)
         converted_new_data = convert_xlsx_rows_to_dict(keys, rows)
 
-        uploaded_at_date_time = datetime.combine(date, time.min)  # Дата выгрузки статистики для MongoDB
+        uploaded_at_date_time = datetime.combine(date, t.min)  # Дата выгрузки статистики для MongoDB
         converted_data = merge_lines(converted_current_data, converted_new_data, uploaded_at_date_time)
 
         await add_many_documents(converted_data, db=db)  # Множественная загрузка в БД
