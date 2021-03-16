@@ -42,5 +42,5 @@ app.include_router(api_router, prefix=settings.API_URL)
 
 
 if __name__ == '__main__':
-    uvicorn.run("application:app", host="127.0.0.1", port=7040, log_level="debug")
+    uvicorn.run("application:app", host="0.0.0.0", port=7040, log_level="debug")
 
