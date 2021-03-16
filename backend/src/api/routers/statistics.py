@@ -1,7 +1,7 @@
 import datetime
 from threading import Thread
 
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 from starlette.responses import FileResponse
 
 from backend.download_stat_script import upload_test_data_to_mongodb, download_statistics_from_certain_date
@@ -13,17 +13,17 @@ from backend.src.apps.statistics.logic import (
 from backend.src.apps.xlsx.utils import prepare_data_from_mongo_for_xlsx, write_data_to_xlsx
 from backend.src.core.config import settings
 from backend.src.schemas.statistics import (
-    BaseParams, DiagramParams, TableParams,
+    BaseParams, DiagramParams, TableParams, XlsxParams,
     DiagramData, TotalData, TableDataByEpisodes,
     TableDataByAnalytics
 )
-from backend.src.utils import run_function_in_separate_thread
+from backend.src.utils import run_function_in_separate_thread, check_url
 
 router = APIRouter()
 
 
 @router.post("/episodes/xlsx/")
-async def get_episodes_statistics_xlsx(params: TableParams):
+async def get_episodes_statistics_xlsx(params: XlsxParams):
     """
     Получение табличных данных по эпизодам в xlsx файле.
 
@@ -38,16 +38,22 @@ async def get_episodes_statistics_xlsx(params: TableParams):
      чтобы передавать номер страницы необходимо высчитывать по формуле limit * number_page.
     """
     total_rows, documents = await get_table_data_by_episodes(**params.dict())
+    if len(documents) == 0:
+        raise HTTPException(status_code=400, detail="No data to create xlsx.")
+
     prepared_data = prepare_data_from_mongo_for_xlsx(documents)
 
-    xlsx_path = settings.FILE_PATH + 'xlsx/' + f'episodes_{datetime.date.today()}.xlsx'
-    write_data_to_xlsx(prepared_data, xlsx_path)
+    xlsx_path = settings.FILE_PATH + 'xlsx/'
+    check_url(xlsx_path)
 
-    return FileResponse(path=xlsx_path, filename=f'{datetime.date.today()}.xlsx')
+    xlsx_full_file_name = xlsx_path + f'episodes_{datetime.date.today()}.xlsx'
+    write_data_to_xlsx(prepared_data, xlsx_full_file_name)
+
+    return FileResponse(path=xlsx_full_file_name, filename=f'{datetime.date.today()}.xlsx')
 
 
 @router.post("/analytics/xlsx/")
-async def get_analytics_statistics_xlsx(params: TableParams):
+async def get_analytics_statistics_xlsx(params: XlsxParams):
     """
     Получение табличных данных по аналитике в xlsx файле.
 
@@ -62,12 +68,18 @@ async def get_analytics_statistics_xlsx(params: TableParams):
      чтобы передавать номер страницы необходимо высчитывать по формуле limit * number_page.
     """
     total_rows, documents = await get_table_data_by_analytics(**params.dict())
+    if len(documents) == 0:
+        raise HTTPException(status_code=400, detail="No data to create xlsx.")
+
     prepared_data = prepare_data_from_mongo_for_xlsx(documents)
 
-    xlsx_path = settings.FILE_PATH + 'xlsx/' + f'analytics_{datetime.date.today()}.xlsx'
-    write_data_to_xlsx(prepared_data, xlsx_path)
+    xlsx_path = settings.FILE_PATH + 'xlsx/'
+    check_url(xlsx_path)
 
-    return FileResponse(path=xlsx_path, filename=f'{datetime.date.today()}.xlsx')
+    xlsx_full_file_name = xlsx_path + f'analytics_{datetime.date.today()}.xlsx'
+    write_data_to_xlsx(prepared_data, xlsx_full_file_name)
+
+    return FileResponse(path=xlsx_full_file_name, filename=f'{datetime.date.today()}.xlsx')
 
 
 @router.post("/total/", response_model=TotalData)

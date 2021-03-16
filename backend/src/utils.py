@@ -1,5 +1,6 @@
 import asyncio
 import inspect
+import os
 import threading
 from datetime import datetime, timedelta
 from decimal import Decimal, ROUND_DOWN
@@ -87,3 +88,9 @@ def get_every_date_in_dates_range_generator(start_date: str, end_date: str):
     for _ in range(number_of_days_between_start_and_end_date + 1):
         yield selected_date
         selected_date += timedelta(days=1)
+
+
+def check_url(url: str) -> None:
+    """Проверка пути в случае если пути к директории нет создает его."""
+    if not os.path.exists(url):
+        os.makedirs(url)

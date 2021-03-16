@@ -68,6 +68,13 @@ class DiagramParams(BaseParams):
         }
 
 
+class XlsxParams(BaseParams):
+    """Body-схема для xlsx данных"""
+
+    limit: int = 10
+    offset: int = 0
+
+
 class TableParams(BaseParams):
     """Body-схема для табличных данных с пагинацией и фильтром по датам."""
 
