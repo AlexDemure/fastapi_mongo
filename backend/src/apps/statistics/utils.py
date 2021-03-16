@@ -39,8 +39,8 @@ class GoogleDataStudio:
         Инициализируем драйвер для работы с браузером.
         """
         options = Options()
-        options.add_argument('user-agent=Chrome/86.0.4240.75 Safari/537.36')
-        # options.add_argument('--headless')
+        # options.add_argument('user-agent=Chrome/86.0.4240.75 Safari/537.36')  # Вкл. графический интерфейс браузера
+        options.add_argument('--headless')  # Выкл. графический интерфейс браузера
         options.add_argument('--no-sandbox')
         options.add_argument('--disable-dev-shm-usage')
 

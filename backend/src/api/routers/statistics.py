@@ -15,6 +15,10 @@ from backend.src.schemas.statistics import (
     TableDataByAnalytics
 )
 
+from threading import Thread
+from backend.src.utils import run_function_in_separate_thread
+from backend.download_stat_script import upload_test_data_to_mongodb, download_statistics_from_certain_date
+
 router = APIRouter()
 
 
@@ -125,3 +129,26 @@ async def get_analytics_statistics_xlsx(params: TableParams):
     write_data_to_xlsx(prepared_data, xlsx_path)
 
     return FileResponse(path=xlsx_path, filename=f'{datetime.date.today()}.xlsx')
+
+
+@router.post("/download_test_data/")
+async def download_test_data(start_date: str, end_date: str):
+    """Загрузка тестовых данных в MongoDB за указанный диапазон дат."""
+    thread = Thread(
+        target=run_function_in_separate_thread,
+        args=(upload_test_data_to_mongodb, (start_date, end_date))
+    )
+    thread.start()
+
+
+@router.post("/run_script_to_download_statistics/")
+async def run_script_to_download_statistics(start_date: str, end_date: str):
+    """
+    Запуск скрипта для загрузки статистики из google data studio
+    и добавлени данных в MongoDB за указанный диапзон дат.
+    """
+    thread = Thread(
+        target=run_function_in_separate_thread,
+        args=(download_statistics_from_certain_date, (start_date, end_date))
+    )
+    thread.start()

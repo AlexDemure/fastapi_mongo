@@ -1,13 +1,7 @@
-import os
 from datetime import datetime, timedelta, time
 
 
-def get_fake_datetime() -> datetime:
-    """Получение даты с учетом сдвига по времени в зависимости от установленного значение в .env окружении."""
-    return datetime.utcnow() + timedelta(days=int(os.environ.get('DAYS', 0)))
-
-
-def get_datetime_start_day(date: datetime = get_fake_datetime()) -> datetime:
+def get_datetime_start_day(date: datetime = datetime.utcnow()) -> datetime:
     """Получение сегодняшней даты в формате datetime с минимальным значениями в часах."""
     return datetime.combine(date, time.min)
 

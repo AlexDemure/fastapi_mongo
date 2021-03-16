@@ -1,16 +1,14 @@
+from structlog import get_logger
+
 from backend.src.apps.statistics.crud import get_count_documents_by_date_today, add_many_documents
 from backend.src.apps.statistics.logic import download_statistics_from_dashboard
 from backend.src.apps.xlsx.utils import parse_xlsx_to_convert_data_to_dict, convert_xlsx_rows_to_dict, merge_lines
 from backend.src.db.database import dashboards_db
 
-from structlog import get_logger
-
 
 async def upload_statistic_data_to_mongodb(db=dashboards_db):
     """
-    Фикстура для загрузки тестовых данных в mongo
-
-    Данная фикстура подходит в качестве функции которая переносит данные из xlsx файла в mongoDB.
+    Скачивает статистику из google data studio и загружает данные в MongoDB за текущую дату.
     """
 
     logger = get_logger()

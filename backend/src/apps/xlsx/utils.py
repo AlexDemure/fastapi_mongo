@@ -21,9 +21,15 @@ def parse_xlsx_to_convert_data_to_dict(filepath: str) -> tuple:
     sheet = file.active  # Выбор активного листа
 
     for index, row in enumerate(sheet.rows):
-        if index == 0:
-            # В случае если повилась \ufeff (метка порядка байтов или BOM), убираем ее.
-            keys = [x.value.replace('\ufeff', '').lower() for x in row]
+        if index == 0:  # Если индекс 0 -> первая строка с названиями колонок
+            keys = list()  # Список название колонок
+            for column in row:
+                # Проверки, т.к. значение ячейки в xlsx может быть None, либо числовым значением.
+                if column.value is not None and isinstance(column.value, str):
+                    # В случае если повилась \ufeff (метка порядка байтов или BOM), убираем ее.
+                    keys.append(column.value.replace('\ufeff', '').lower())
+                else:
+                    keys.append(column.value)
             continue
 
         # Преобразуем данные внутри строки в список

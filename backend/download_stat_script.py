@@ -1,39 +1,17 @@
 import argparse
 import asyncio
 import time
-from datetime import datetime, timedelta
+from datetime import datetime, time
 from datetime import time as t
 
 from structlog import get_logger
 
 from backend.src.apps.statistics.crud import get_count_documents_by_date_today, add_many_documents
-from backend.src.apps.statistics.settings import DATASTUDIO_LINK
+from backend.src.apps.statistics.settings import DATASTUDIO_LINK, FILE_PATH
 from backend.src.apps.statistics.utils import GoogleDataStudio
 from backend.src.apps.xlsx.utils import parse_xlsx_to_convert_data_to_dict, convert_xlsx_rows_to_dict, merge_lines
 from backend.src.db.database import dashboards_db
-
-
-def get_every_date_in_dates_range_generator(start_date: str, end_date: str):
-    """
-    Генератор. Получаем каждую дату из заданного диапазона, включая конец и начало диапазона.
-
-    :param start_date: Начало диапазона, строка вида - "ГГГГ-ММ-ДД".
-    :param end_date: Конец диапазона, строка вида - "ГГГГ-ММ-ДД".
-    :return объект date из модуля datetime.
-    """
-    end_date = datetime.strptime(end_date, '%Y-%m-%d').date()
-    start_date = datetime.strptime(start_date, '%Y-%m-%d').date()
-
-    if end_date > start_date:
-        number_of_days_between_start_and_end_date = (end_date - start_date).days
-    else:
-        raise ValueError('End range date can\'t be smaller then start range date')
-
-    selected_date = start_date
-
-    for _ in range(number_of_days_between_start_and_end_date + 1):
-        yield selected_date
-        selected_date += timedelta(days=1)
+from backend.src.utils import get_every_date_in_dates_range_generator
 
 
 async def download_statistics_from_certain_date(start_date: str, end_date: str, db=dashboards_db) -> None:
@@ -89,6 +67,37 @@ async def download_statistics_from_certain_date(start_date: str, end_date: str, 
 
         data_studio.driver.get(DATASTUDIO_LINK)  # Перезагружаем страницу с data studio
         time.sleep(5)
+
+
+async def upload_test_data_to_mongodb(start_date: str, end_date: str, db=dashboards_db):
+    """
+    Фикстура для загрузки тестовых данных в mongo
+    Данная фикстура подходит в качестве функции которая переносит данные из xlsx файла в mongoDB.
+    """
+
+    current_dashboard = FILE_PATH + "current_dashboard.xlsx"
+    new_dashboard = FILE_PATH + "new_dashboard.xlsx"
+
+    for date in get_every_date_in_dates_range_generator(start_date, end_date):
+
+        print("Start upload test data.")
+        count_documents = await get_count_documents_by_date_today(db=db)
+
+        if count_documents > 0:
+            print(f"Documents found. Skipping loading test data. Count documents today:{count_documents}")
+            continue
+
+        keys, rows = parse_xlsx_to_convert_data_to_dict(current_dashboard)
+        converted_current_data = convert_xlsx_rows_to_dict(keys, rows)
+
+        keys, rows = parse_xlsx_to_convert_data_to_dict(new_dashboard)
+        converted_new_data = convert_xlsx_rows_to_dict(keys, rows)
+
+        uploaded_at_date_time = datetime.combine(date, time.min)  # Дата выгрузки статистики для MongoDB
+        converted_data = merge_lines(converted_current_data, converted_new_data, uploaded_at_date_time)
+
+        await add_many_documents(converted_data, db=db)  # Множественная загрузка в БД
+        print(f"Documents is uploaded. Count:{len(converted_data)}")
 
 
 if __name__ == '__main__':

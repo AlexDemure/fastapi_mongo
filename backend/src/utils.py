@@ -1,6 +1,7 @@
 import asyncio
 import inspect
 import threading
+from datetime import datetime, timedelta
 from decimal import Decimal, ROUND_DOWN
 from typing import Union
 
@@ -37,7 +38,7 @@ def async_function_wrapper_to_run_in_thread(async_func, args=None):
     if args is None:
         loop.run_until_complete(async_func(db))
     else:
-        loop.run_until_complete(async_func(args, db))
+        loop.run_until_complete(async_func(*args, db))
 
     loop.close()
 
@@ -60,6 +61,29 @@ def run_function_in_separate_thread(func, args=None):
     else:  # Если функция вляется синхронной
         new_thread = threading.Thread(
             target=func,
-            args=(args, )
+            args=(*args, )
         )
     new_thread.start()  # Запускаем новый поток
+
+
+def get_every_date_in_dates_range_generator(start_date: str, end_date: str):
+    """
+    Генератор. Получаем каждую дату из заданного диапазона, включая конец и начало диапазона.
+
+    :param start_date: Начало диапазона, строка вида - "ГГГГ-ММ-ДД".
+    :param end_date: Конец диапазона, строка вида - "ГГГГ-ММ-ДД".
+    :return объект date из модуля datetime.
+    """
+    end_date = datetime.strptime(end_date, '%Y-%m-%d').date()
+    start_date = datetime.strptime(start_date, '%Y-%m-%d').date()
+
+    if end_date > start_date:
+        number_of_days_between_start_and_end_date = (end_date - start_date).days
+    else:
+        raise ValueError('End range date can\'t be smaller then start range date')
+
+    selected_date = start_date
+
+    for _ in range(number_of_days_between_start_and_end_date + 1):
+        yield selected_date
+        selected_date += timedelta(days=1)
