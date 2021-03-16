@@ -18,3 +18,4 @@ structlog==21.1.0
 tzlocal==2.1
 urllib3==1.26.3
 uvicorn==0.13.4
+aiofiles==0.6.0

@@ -22,6 +22,54 @@ from backend.src.utils import run_function_in_separate_thread
 router = APIRouter()
 
 
+@router.post("/episodes/xlsx/")
+async def get_episodes_statistics_xlsx(params: TableParams):
+    """
+    Получение табличных данных по эпизодам в xlsx файле.
+
+    - **validation #1**: Список books должен быть больше 0.
+    - **validation #2**: Передавать start_date и end_date вместе
+     если будет передано только одно значение фильтры по датам не применятся.
+     - **validation #3**: End_date должен быть больше start_date в днях.
+     - **validation #4**: Диапозон дат не должен превышать более 720 дней.
+     - **validation #5**: limit и offset можно не передавать,
+      по дефолту будет 10 записей и с 0-вым индексом (1 страница).
+     Offset - срез записей, если передавать значение 20 тогда будут пропущены первые 20 записей из запроса,
+     чтобы передавать номер страницы необходимо высчитывать по формуле limit * number_page.
+    """
+    total_rows, documents = await get_table_data_by_episodes(**params.dict())
+    prepared_data = prepare_data_from_mongo_for_xlsx(documents)
+
+    xlsx_path = settings.FILE_PATH + 'xlsx/' + f'episodes_{datetime.date.today()}.xlsx'
+    write_data_to_xlsx(prepared_data, xlsx_path)
+
+    return FileResponse(path=xlsx_path, filename=f'{datetime.date.today()}.xlsx')
+
+
+@router.post("/analytics/xlsx/")
+async def get_analytics_statistics_xlsx(params: TableParams):
+    """
+    Получение табличных данных по аналитике в xlsx файле.
+
+    - **validation #1**: Список books должен быть больше 0.
+    - **validation #2**: Передавать start_date и end_date вместе
+     если будет передано только одно значение фильтры по датам не применятся.
+     - **validation #3**: End_date должен быть больше start_date в днях.
+     - **validation #4**: Диапозон дат не должен превышать более 720 дней.
+     - **validation #5**: limit и offset можно не передавать,
+      по дефолту будет 10 записей и и с 0-вым индексом (1 страница).
+     Offset - срез записей, если передавать значение 20 тогда будут пропущены первые 20 записей из запроса,
+     чтобы передавать номер страницы необходимо высчитывать по формуле limit * number_page.
+    """
+    total_rows, documents = await get_table_data_by_analytics(**params.dict())
+    prepared_data = prepare_data_from_mongo_for_xlsx(documents)
+
+    xlsx_path = settings.FILE_PATH + 'xlsx/' + f'analytics_{datetime.date.today()}.xlsx'
+    write_data_to_xlsx(prepared_data, xlsx_path)
+
+    return FileResponse(path=xlsx_path, filename=f'{datetime.date.today()}.xlsx')
+
+
 @router.post("/total/", response_model=TotalData)
 async def get_total_data(params: BaseParams):
     """
@@ -81,54 +129,6 @@ async def get_analytics_data(params: TableParams):
      чтобы передавать номер страницы необходимо высчитывать по формуле limit * number_page.
     """
     return await collect_table_data_by_analytics(params)
-
-
-@router.post("/episodes/xlsx/")
-async def get_episodes_statistics_xlsx(params: TableParams):
-    """
-    Получение табличных данных по эпизодам в xlsx файле.
-
-    - **validation #1**: Список books должен быть больше 0.
-    - **validation #2**: Передавать start_date и end_date вместе
-     если будет передано только одно значение фильтры по датам не применятся.
-     - **validation #3**: End_date должен быть больше start_date в днях.
-     - **validation #4**: Диапозон дат не должен превышать более 720 дней.
-     - **validation #5**: limit и offset можно не передавать,
-      по дефолту будет 10 записей и с 0-вым индексом (1 страница).
-     Offset - срез записей, если передавать значение 20 тогда будут пропущены первые 20 записей из запроса,
-     чтобы передавать номер страницы необходимо высчитывать по формуле limit * number_page.
-    """
-    total_rows, documents = await get_table_data_by_episodes(**params.dict())
-    prepared_data = prepare_data_from_mongo_for_xlsx(documents)
-
-    xlsx_path = settings.FILE_PATH + 'xlsx/' + f'episodes_{datetime.date.today()}.xlsx'
-    write_data_to_xlsx(prepared_data, xlsx_path)
-
-    return FileResponse(path=xlsx_path, filename=f'{datetime.date.today()}.xlsx')
-
-
-@router.post("/analytics/xlsx/")
-async def get_analytics_statistics_xlsx(params: TableParams):
-    """
-    Получение табличных данных по аналитике в xlsx файле.
-
-    - **validation #1**: Список books должен быть больше 0.
-    - **validation #2**: Передавать start_date и end_date вместе
-     если будет передано только одно значение фильтры по датам не применятся.
-     - **validation #3**: End_date должен быть больше start_date в днях.
-     - **validation #4**: Диапозон дат не должен превышать более 720 дней.
-     - **validation #5**: limit и offset можно не передавать,
-      по дефолту будет 10 записей и и с 0-вым индексом (1 страница).
-     Offset - срез записей, если передавать значение 20 тогда будут пропущены первые 20 записей из запроса,
-     чтобы передавать номер страницы необходимо высчитывать по формуле limit * number_page.
-    """
-    total_rows, documents = await get_table_data_by_analytics(**params.dict())
-    prepared_data = prepare_data_from_mongo_for_xlsx(documents)
-
-    xlsx_path = settings.FILE_PATH + 'xlsx/' + f'analytics_{datetime.date.today()}.xlsx'
-    write_data_to_xlsx(prepared_data, xlsx_path)
-
-    return FileResponse(path=xlsx_path, filename=f'{datetime.date.today()}.xlsx')
 
 
 @router.post("/download_test_data/")

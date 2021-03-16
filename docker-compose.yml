@@ -1,40 +1,37 @@
-version: "3.8"
+version: "3.5"
 
 
 services:
   statistics:
     build: backend
     container_name: statistics
-    command: uvicorn backend.src.core.application:app --host 127.0.0.1 --port 7040
+    command: uvicorn backend.src.core.application:app --host 0.0.0.0 --port 7040
     hostname: statistics
-    network_mode: "host"
+    networks:
+      - maininfrnet
     env_file:
       - backend/.env
     ports:
-      - "7040:7040"
+      - 7040:7040
     volumes:
       - ./backend:/backend/
 
-  mongodb:
-    image: mongo:latest
-    container_name: mongodb
-    hostname: mongodb
-    env_file:
-      - backend/.env
-    ports:
-      - "27017:27017"
-    volumes:
-      - mongodb:/data/db
 
   frontend:
     build: frontend
     container_name: frontend
     hostname: frontend
-    network_mode: host
+    networks:
+      - maininfrnet
     ports:
-      - "3000:3000"
+      - 3000:3000
     volumes:
       - ./frontend:/app/
+
+networks:
+  maininfrnet:
+    external:
+      name: infr_network
 
 
 volumes:
