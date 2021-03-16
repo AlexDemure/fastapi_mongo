@@ -4,10 +4,10 @@ from pydantic import BaseSettings, validator
 
 
 class MongoDBSettings(BaseSettings):
-    mongo_username = os.environ['MONGO_INITDB_ROOT_USERNAME']
-    mongo_password = os.environ['MONGO_INITDB_ROOT_PASSWORD']
-    mongo_host = os.environ['MONGO_HOST']
-    mongo_port = os.environ['MONGO_PORT']
+    mongo_username = os.environ.get('MONGO_INITDB_ROOT_USERNAME', 'root')
+    mongo_password = os.environ.get('MONGO_INITDB_ROOT_PASSWORD', 'rootpassword')
+    mongo_host = os.environ.get('MONGO_HOST', 'localhost')
+    mongo_port = os.environ.get('MONGO_PORT', '27017')
 
     mongo_uri: Optional[str] = None
 

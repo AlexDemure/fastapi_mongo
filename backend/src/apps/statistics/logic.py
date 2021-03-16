@@ -1,9 +1,13 @@
 import math
+import time
 
 from backend.src.apps.statistics.crud import (
     get_total_data_by_period, get_diagram_data_by_periods,
     get_table_data_by_episodes, get_table_data_by_analytics
 )
+from backend.src.apps.statistics.settings import DATASTUDIO_LINK
+from backend.src.apps.statistics.utils import GoogleDataStudio
+from backend.src.db.database import dashboards_db
 from backend.src.overrides import get_datetime_for_last_week
 from backend.src.schemas.statistics import (
     BaseParams, DiagramParams, DiagramData,
@@ -77,3 +81,24 @@ async def collect_table_data_by_analytics(params: TableParams) -> TableDataByAna
         total_rows=total_rows,
         count_pages=math.ceil(total_rows / params.limit)
     )
+
+
+async def download_statistics_from_dashboard(db=dashboards_db) -> tuple:
+    """
+    Скачивание файлов статистики из 2-х дашбордов в google data studio.
+
+    Используем selenium, вместо Google Data Studio API, т.к.
+    невозможно подключить API к текущему аккаунту из-за ограничений со стороный Storytel.
+    :return кортеж, где 1-й эл. - полный путь к файлу с общей статистикой,
+    2-й эл. - полный путь к файлу с статистики C20 / C25.
+    """
+    data_studio = GoogleDataStudio()
+    await data_studio.login_to_data_studio(db)  # Заходим в лк google data studio
+    general_statistics = data_studio.download_general_statistics_for_one_day()  # Скачиваем и получаем полную путь к файлу стат.
+
+    data_studio.driver.get(DATASTUDIO_LINK)  # Перезагружаем страницу с data studio
+    time.sleep(5)
+
+    audiobook_rates_statistic = data_studio.download_audiobook_rates_statistic_for_one_day()  # Скач. и получ. полн.путь к стат.
+
+    return general_statistics, audiobook_rates_statistic

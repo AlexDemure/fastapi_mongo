@@ -28,17 +28,27 @@ def common_filter(books: list, start_date: datetime = None, end_date: datetime =
     return filters
 
 
-async def get_count_documents_by_date_today():
+async def get_count_documents_by_date_today(db=dashboards_db):
     """Поиск загруженных документов за сегодняшний день."""
-    return await dashboards_db.collection.count_documents({'uploaded_at': get_datetime_start_day()})
+    return await db.collection.count_documents({'uploaded_at': get_datetime_start_day()})
 
 
-async def add_many_documents(documents: list):
+async def add_many_documents(documents: list, db=dashboards_db):
     """Множественная загрузка документов за один заход."""
-    await dashboards_db.collection.insert_many(documents)  # Множественная загрузка в БД
+    await db.collection.insert_many(documents)  # Множественная загрузка в БД
 
 
-async def get_total_data_by_period(books: list, period: datetime = None) -> Optional[dict]:
+async def add_document(document: dict, db=dashboards_db):
+    """Добавление одного документа."""
+    await db.collection.insert_one(document)
+
+
+async def get_document_by_key(key: str, db=dashboards_db):
+    """Получение одного документа по ключу."""
+    return await db.collection.find_one_and_delete({key: {'$ne': None}})
+
+
+async def get_total_data_by_period(books: list, period: datetime = None, db=dashboards_db) -> Optional[dict]:
     """Получение данных за весь период."""
     filters = [
         {
@@ -53,14 +63,15 @@ async def get_total_data_by_period(books: list, period: datetime = None) -> Opti
         }
     ]
 
-    async for document in dashboards_db.collection.aggregate(pipeline_for_total_data(filters)):
+    async for document in db.collection.aggregate(pipeline_for_total_data(filters)):
         return document
 
 
 async def get_diagram_data_by_periods(
         books: list,
         start_date: datetime = None,
-        end_date: datetime = None
+        end_date: datetime = None,
+        db=dashboards_db
 ) -> list:
     """Получение данных за промежуток времени для данных в виде диаграммы."""
     documents = []  # Найденые документы
@@ -68,7 +79,7 @@ async def get_diagram_data_by_periods(
     filters = common_filter(books, start_date, end_date)  # Получение фильтров
 
     # Получение записей с offset и limit
-    async for document in dashboards_db.collection.aggregate(pipeline_for_diagram(filters)):
+    async for document in db.collection.aggregate(pipeline_for_diagram(filters)):
         documents.append(document)
 
     return documents
@@ -80,6 +91,7 @@ async def get_table_data_by_episodes(
         end_date: datetime = None,
         limit: int = 10,
         offset: int = 0,
+        db=dashboards_db
 
 ) -> tuple:
     """Получение табличных данных для таблицы со списком эпизодов."""
@@ -88,10 +100,10 @@ async def get_table_data_by_episodes(
     filters = common_filter(books, start_date, end_date)  # Получение фильтров
 
     # Получение общего количество записей без offset и limit
-    total_rows = await dashboards_db.collection.count_documents({"$and": filters})
+    total_rows = await db.collection.count_documents({"$and": filters})
 
     # Получение записей с offset и limit
-    async for document in dashboards_db.collection.aggregate(pipeline_for_episodes(filters, offset, limit)):
+    async for document in db.collection.aggregate(pipeline_for_episodes(filters, offset, limit)):
         documents.append(document)
 
     return total_rows, documents
@@ -103,6 +115,7 @@ async def get_table_data_by_analytics(
         end_date: datetime = None,
         limit: int = 10,
         offset: int = 0,
+        db=dashboards_db
 
 ) -> tuple:
     """Получение табличных данных для таблицы с аналитикой."""
@@ -111,10 +124,10 @@ async def get_table_data_by_analytics(
     filters = common_filter(books, start_date, end_date)  # Получение фильтров
 
     # Получение общего количество записей без offset и limit
-    total_rows = await dashboards_db.collection.count_documents({"$and": filters})
+    total_rows = await db.collection.count_documents({"$and": filters})
 
     # Получение записей с offset и limit
-    async for document in dashboards_db.collection.aggregate(pipeline_for_analytics(filters, offset, limit)):
+    async for document in db.collection.aggregate(pipeline_for_analytics(filters, offset, limit)):
         documents.append(document)
 
     return total_rows, documents
