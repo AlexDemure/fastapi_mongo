@@ -120,7 +120,7 @@ class App extends Component {
       limit: limit,
       offset: (current_page-1) * limit  //'-1' потому что отчет с первой страницы, а не с нулевой. при умножении отбрасывается корректное количество записей таблицы на предыдущих страницах
     };
-    axios.post('http://localhost:7040/api/v1/get_analytics_statistics_xlsx/', request).then(res => {
+    axios.post('http://localhost:7040/api/v1/statistics/analytics/xlsx/', request).then(res => {
       console.log(res.data);
     });
   }
@@ -141,7 +141,7 @@ class App extends Component {
       limit: limit,
       offset: (current_page-1) * limit  //'-1' потому что отчет с первой страницы, а не с нулевой. при умножении отбрасывается корректное количество записей таблицы на предыдущих страницах
     };
-    axios.post('http://localhost:7040/api/v1/get_episodes_statistics_xlsx/', request).then(res => {
+    axios.post('http://localhost:7040/api/v1/statistics/episodes/xlsx/', request).then(res => {
       console.log(res.data);
     });
   }
