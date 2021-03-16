@@ -31,6 +31,7 @@ class App extends Component {
       count_rows: 0,
       total_rows: 0
     };
+    this.host = 'http://localhost:7040/api/v1/statistics/';
   }
 
   onToggleCalendar = () => {
@@ -92,7 +93,7 @@ class App extends Component {
         "0405010075442"
       ]
     };
-    axios.post('http://localhost:7040/api/v1/statistics/total/', request).then(res => {
+    axios.post(this.host + 'total/', request).then(res => {
       this.setState({
         total_hours_listened: Math.floor(res.data.total_hours_listened),
         hours_listened_in_week: Math.floor(res.data.hours_listened_in_week),
@@ -120,7 +121,7 @@ class App extends Component {
       limit: limit,
       offset: (current_page-1) * limit  //'-1' потому что отчет с первой страницы, а не с нулевой. при умножении отбрасывается корректное количество записей таблицы на предыдущих страницах
     };
-    axios.post('http://localhost:7040/api/v1/statistics/analytics/xlsx/', request).then(res => {
+    axios.post(this.host + 'analytics/xlsx/', request).then(res => {
       console.log(res.data);
     });
   }
@@ -141,7 +142,7 @@ class App extends Component {
       limit: limit,
       offset: (current_page-1) * limit  //'-1' потому что отчет с первой страницы, а не с нулевой. при умножении отбрасывается корректное количество записей таблицы на предыдущих страницах
     };
-    axios.post('http://localhost:7040/api/v1/statistics/episodes/xlsx/', request).then(res => {
+    axios.post(this.host + 'episodes/xlsx/', request).then(res => {
       console.log(res.data);
     });
   }
@@ -160,7 +161,7 @@ class App extends Component {
       start_date: startDate,
       end_date: endDate
     };
-    axios.post('http://localhost:7040/api/v1/statistics/diagram/', request).then(res => {
+    axios.post(this.host + 'diagram/', request).then(res => {
       this.setState({
         points: res.data.points
       }, this.createDiagram);
@@ -213,7 +214,7 @@ class App extends Component {
       limit: limit,
       offset: (current_page-1) * limit  //'-1' потому что отчет с первой страницы, а не с нулевой. при умножении отбрасывается корректное количество записей таблицы на предыдущих страницах
     };
-    axios.post('http://localhost:7040/api/v1/statistics/episodes/', request).then(res => {
+    axios.post(this.host + 'episodes/', request).then(res => {
       this.setState({
         count_pages: res.data.count_pages,
         episodes: res.data.rows,
