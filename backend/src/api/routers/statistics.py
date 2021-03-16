@@ -83,7 +83,7 @@ async def get_analytics_data(params: TableParams):
     return await collect_table_data_by_analytics(params)
 
 
-@router.post("/get_episodes_statistics_xlsx/")
+@router.post("/episodes/xlsx/")
 async def get_episodes_statistics_xlsx(params: TableParams):
     """
     Получение табличных данных по эпизодам в xlsx файле.
@@ -107,7 +107,7 @@ async def get_episodes_statistics_xlsx(params: TableParams):
     return FileResponse(path=xlsx_path, filename=f'{datetime.date.today()}.xlsx')
 
 
-@router.post("/get_analytics_statistics_xlsx/")
+@router.post("/analytics/xlsx/")
 async def get_analytics_statistics_xlsx(params: TableParams):
     """
     Получение табличных данных по аналитике в xlsx файле.
