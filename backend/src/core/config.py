@@ -1,7 +1,8 @@
 from backend.src.db.settings import MongoDBSettings
+from backend.src.apps.statistics.settings import StatisticSettings
 
 # INCLUDE SETTINGS
-configs = [MongoDBSettings]
+configs = [MongoDBSettings, StatisticSettings]
 
 
 class Settings(*configs):

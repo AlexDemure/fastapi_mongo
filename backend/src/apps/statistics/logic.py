@@ -5,8 +5,8 @@ from backend.src.apps.statistics.crud import (
     get_total_data_by_period, get_diagram_data_by_periods,
     get_table_data_by_episodes, get_table_data_by_analytics
 )
-from backend.src.apps.statistics.settings import DATASTUDIO_LINK
 from backend.src.apps.statistics.utils import GoogleDataStudio
+from backend.src.core.config import settings
 from backend.src.db.database import dashboards_db
 from backend.src.overrides import get_datetime_for_last_week
 from backend.src.schemas.statistics import (
@@ -96,7 +96,7 @@ async def download_statistics_from_dashboard(db=dashboards_db) -> tuple:
     await data_studio.login_to_data_studio(db)  # Заходим в лк google data studio
     general_statistics = data_studio.download_general_statistics_for_one_day()  # Скачиваем и получаем полную путь к файлу стат.
 
-    data_studio.driver.get(DATASTUDIO_LINK)  # Перезагружаем страницу с data studio
+    data_studio.driver.get(settings.DATASTUDIO_LINK)  # Перезагружаем страницу с data studio
     time.sleep(5)
 
     audiobook_rates_statistic = data_studio.download_audiobook_rates_statistic_for_one_day()  # Скач. и получ. полн.путь к стат.

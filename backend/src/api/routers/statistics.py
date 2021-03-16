@@ -10,8 +10,8 @@ from backend.src.apps.statistics.logic import (
     collect_total_data, collect_diagram_data,
     collect_table_data_by_analytics, collect_table_data_by_episodes
 )
-from backend.src.apps.statistics.settings import FILE_PATH
 from backend.src.apps.xlsx.utils import prepare_data_from_mongo_for_xlsx, write_data_to_xlsx
+from backend.src.core.config import settings
 from backend.src.schemas.statistics import (
     BaseParams, DiagramParams, TableParams,
     DiagramData, TotalData, TableDataByEpisodes,
@@ -101,7 +101,7 @@ async def get_episodes_statistics_xlsx(params: TableParams):
     total_rows, documents = await get_table_data_by_episodes(**params.dict())
     prepared_data = prepare_data_from_mongo_for_xlsx(documents)
 
-    xlsx_path = FILE_PATH + 'xlsx/' + f'episodes_{datetime.date.today()}.xlsx'
+    xlsx_path = settings.FILE_PATH + 'xlsx/' + f'episodes_{datetime.date.today()}.xlsx'
     write_data_to_xlsx(prepared_data, xlsx_path)
 
     return FileResponse(path=xlsx_path, filename=f'{datetime.date.today()}.xlsx')
@@ -125,7 +125,7 @@ async def get_analytics_statistics_xlsx(params: TableParams):
     total_rows, documents = await get_table_data_by_analytics(**params.dict())
     prepared_data = prepare_data_from_mongo_for_xlsx(documents)
 
-    xlsx_path = FILE_PATH + 'xlsx/' + f'analytics_{datetime.date.today()}.xlsx'
+    xlsx_path = settings.FILE_PATH + 'xlsx/' + f'analytics_{datetime.date.today()}.xlsx'
     write_data_to_xlsx(prepared_data, xlsx_path)
 
     return FileResponse(path=xlsx_path, filename=f'{datetime.date.today()}.xlsx')

@@ -1,9 +1,9 @@
+import datetime
 import os
 import pickle
 import time
 
 import bs4
-import datetime
 from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver import ActionChains
@@ -11,9 +11,9 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.remote.webelement import WebElement
 from structlog import get_logger
 
-from backend.src.apps.statistics.settings import FILE_PATH, GOOGLE_ACCOUNT, GOOGLE_PASSWORD, DATASTUDIO_LINK, CHROMEDRIVER_PATH
 from backend.src.apps.statistics.crud import get_document_by_key
 from backend.src.apps.xlsx.utils import prepare_data_from_csv_for_xlsx, write_data_to_xlsx
+from backend.src.core.config import settings
 
 
 class GoogleDataStudio:
@@ -22,7 +22,7 @@ class GoogleDataStudio:
     driver = None  # Драйвер для взаимодействия с браузером.
     action_chains = None  # Объект для низкоуровневыхх действий в браузере: нажатие кнопок, движение мыши и.т.п
 
-    path_to_download_dir = FILE_PATH + 'data_studio/'  # Директория для загрузки файлов из браузера.
+    path_to_download_dir = settings.FILE_PATH + 'data_studio/'  # Директория для загрузки файлов из браузера.
     path_to_cookie_pickle = path_to_download_dir + 'cookies.pkl'
 
     statistic_name = 'Publisher Dashboard 2.0 (Storytel Hub - Russia Self Publishing Portal)'
@@ -49,7 +49,7 @@ class GoogleDataStudio:
         options.add_experimental_option('prefs', prefs)
 
         driver = webdriver.Chrome(  # Объект для управления браузером.
-            executable_path=CHROMEDRIVER_PATH,
+            executable_path=settings.CHROMEDRIVER_PATH,
             chrome_options=options
         )
         return driver
@@ -76,7 +76,7 @@ class GoogleDataStudio:
             email = self.driver.find_element_by_id('identifierId')
         except NoSuchElementException:
             email = self.driver.find_element_by_id('Email')
-        email.send_keys(GOOGLE_ACCOUNT)  # Вводим логин google аккаунта
+        email.send_keys(settings.GOOGLE_ACCOUNT)  # Вводим логин google аккаунта
 
         try:  # Пытаемся найти кнопку для перехода к следующему шагу авторизации
             next_ = self.driver.find_element_by_id('identifierNext')
@@ -89,7 +89,7 @@ class GoogleDataStudio:
             passwd = self.driver.find_element_by_name('password')
         except NoSuchElementException:
             passwd = self.driver.find_element_by_id('password')
-        passwd.send_keys(GOOGLE_PASSWORD)  # Вводим пароль google аккаунта
+        passwd.send_keys(settings.GOOGLE_PASSWORD)  # Вводим пароль google аккаунта
 
         try:  # Пытаемся найти кнопку для перехода к следующему шагу авторизации
             next_ = self.driver.find_element_by_id('passwordNext')
@@ -128,13 +128,13 @@ class GoogleDataStudio:
         self.driver.get('https://datastudio.google.com/')
         self.upload_cookies_to_browser()
 
-        self.driver.get(DATASTUDIO_LINK)
+        self.driver.get(settings.DATASTUDIO_LINK)
         self.driver.maximize_window()  # Запуск. полноэкранный режим, чтобы все элементы были в зоне видимости selenium
 
         time.sleep(5)
-        if self.driver.current_url != DATASTUDIO_LINK:  # Блок авторизации
+        if self.driver.current_url != settings.DATASTUDIO_LINK:  # Блок авторизации
             await self.authorization(db)
-            self.driver.get(DATASTUDIO_LINK)  # data studio
+            self.driver.get(settings.DATASTUDIO_LINK)  # data studio
 
         pickle.dump(self.driver.get_cookies(), open(self.path_to_cookie_pickle, "wb"))  # Сохранение куки
         self.logger.debug('Cookies updated')

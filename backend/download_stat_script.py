@@ -7,9 +7,9 @@ from datetime import time as t
 from structlog import get_logger
 
 from backend.src.apps.statistics.crud import get_count_documents_by_date_today, add_many_documents
-from backend.src.apps.statistics.settings import DATASTUDIO_LINK, FILE_PATH
 from backend.src.apps.statistics.utils import GoogleDataStudio
 from backend.src.apps.xlsx.utils import parse_xlsx_to_convert_data_to_dict, convert_xlsx_rows_to_dict, merge_lines
+from backend.src.core.config import settings
 from backend.src.db.database import dashboards_db
 from backend.src.utils import get_every_date_in_dates_range_generator
 
@@ -37,7 +37,7 @@ async def download_statistics_from_certain_date(start_date: str, end_date: str, 
 
         general_statistics = data_studio.download_general_statistics_for_one_day(date=date)
 
-        data_studio.driver.get(DATASTUDIO_LINK)  # Перезагружаем страницу с data studio
+        data_studio.driver.get(settings.DATASTUDIO_LINK)  # Перезагружаем страницу с data studio
         time.sleep(5)
 
         audiobook_rates_statistic = data_studio.download_audiobook_rates_statistic_for_one_day(date=date)
@@ -63,7 +63,7 @@ async def download_statistics_from_certain_date(start_date: str, end_date: str, 
 
         logger.debug(f"Documents is uploaded. Count:{len(converted_data)}")
 
-        data_studio.driver.get(DATASTUDIO_LINK)  # Перезагружаем страницу с data studio
+        data_studio.driver.get(settings.DATASTUDIO_LINK)  # Перезагружаем страницу с data studio
         time.sleep(5)
 
 
@@ -73,8 +73,8 @@ async def upload_test_data_to_mongodb(start_date: str, end_date: str, db=dashboa
     Данная фикстура подходит в качестве функции которая переносит данные из xlsx файла в mongoDB.
     """
 
-    current_dashboard = FILE_PATH + "current_dashboard.xlsx"
-    new_dashboard = FILE_PATH + "new_dashboard.xlsx"
+    current_dashboard = settings.FILE_PATH + "current_dashboard.xlsx"
+    new_dashboard = settings.FILE_PATH + "new_dashboard.xlsx"
 
     for date in get_every_date_in_dates_range_generator(start_date, end_date):
 
