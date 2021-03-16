@@ -11,7 +11,7 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.remote.webelement import WebElement
 from structlog import get_logger
 
-from backend.src.apps.statistics.settings import FILE_PATH, GOOGLE_ACCOUNT, GOOGLE_PASSWORD, DATASTUDIO_LINK
+from backend.src.apps.statistics.settings import FILE_PATH, GOOGLE_ACCOUNT, GOOGLE_PASSWORD, DATASTUDIO_LINK, CHROMEDRIVER_PATH
 from backend.src.apps.statistics.crud import get_document_by_key
 from backend.src.apps.xlsx.utils import prepare_data_from_csv_for_xlsx, write_data_to_xlsx
 
@@ -49,7 +49,7 @@ class GoogleDataStudio:
         options.add_experimental_option('prefs', prefs)
 
         driver = webdriver.Chrome(  # Объект для управления браузером.
-            executable_path="/usr/bin/chromedriver",  # /usr/local/bin/chromedriver
+            executable_path=CHROMEDRIVER_PATH,
             chrome_options=options
         )
         return driver

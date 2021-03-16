@@ -1,7 +1,10 @@
 import datetime
+from threading import Thread
+
 from fastapi import APIRouter
 from starlette.responses import FileResponse
 
+from backend.download_stat_script import upload_test_data_to_mongodb, download_statistics_from_certain_date
 from backend.src.apps.statistics.crud import get_table_data_by_episodes, get_table_data_by_analytics
 from backend.src.apps.statistics.logic import (
     collect_total_data, collect_diagram_data,
@@ -14,10 +17,7 @@ from backend.src.schemas.statistics import (
     DiagramData, TotalData, TableDataByEpisodes,
     TableDataByAnalytics
 )
-
-from threading import Thread
 from backend.src.utils import run_function_in_separate_thread
-from backend.download_stat_script import upload_test_data_to_mongodb, download_statistics_from_certain_date
 
 router = APIRouter()
 
